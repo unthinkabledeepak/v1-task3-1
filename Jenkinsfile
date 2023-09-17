@@ -19,7 +19,7 @@ node {
                         //sh "git switch master"
                         sh "echo ${APPIMAGE}"
                         sh "cat /values.yaml"
-                        sh "sed -i 's+deepakc826/v1-task3.*+deepakc826/v1-task3:${APPIMAGE}-${DOCKERTAG}+g' /values.yaml"
+                        sh "sed -i 's+deepakc826/v1-task3:${APPIMAGE}.*+deepakc826/v1-task3:${APPIMAGE}-${DOCKERTAG}+g' /values.yaml"
                         sh "cat /values.yaml"
                         sh "git add ."
                         sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
