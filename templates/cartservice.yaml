@@ -176,3 +176,40 @@ spec:
         - "7070"
 {{- end }}
 {{- end }}
+
+
+---
+
+{{- if .Values.cartService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.cartService.name }}
+  labels:
+    app: {{ .Values.cartService.name }}
+  # namespace: {{ .Values.cartService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.cartService.name }}
+  minReplicas: {{ .Values.cartService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.cartService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.cartService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.cartService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.cartService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.cartService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

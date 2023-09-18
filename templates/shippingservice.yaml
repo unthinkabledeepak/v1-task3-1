@@ -161,3 +161,40 @@ spec:
         - "50051"
 {{- end }}
 {{- end }}
+
+
+---
+
+{{- if .Values.shippingService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.shippingService.name }}
+  labels:
+    app: {{ .Values.shippingService.name }}
+  # namespace: {{ .Values.shippingService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.shippingService.name }}
+  minReplicas: {{ .Values.shippingService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.shippingService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.shippingService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.shippingService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.shippingService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.shippingService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

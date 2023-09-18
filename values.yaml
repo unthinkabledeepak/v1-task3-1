@@ -7,6 +7,8 @@ images:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+
+
 serviceAccounts:
   # Specifies whether service accounts should be created.
   create: false
@@ -52,6 +54,13 @@ adService:
     limits:
       cpu: 300m
       memory: 300Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 cartService:
   create: true
@@ -64,6 +73,13 @@ cartService:
     limits:
       cpu: 300m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 checkoutService:
   create: true
@@ -75,6 +91,13 @@ checkoutService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 currencyService:
   create: true
@@ -86,6 +109,13 @@ currencyService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 emailService:
   create: true
@@ -97,6 +127,13 @@ emailService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 frontend:
   create: true
@@ -122,6 +159,13 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 loadGenerator:
   create: true
@@ -134,6 +178,13 @@ loadGenerator:
     limits:
       cpu: 500m
       memory: 512Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 paymentService:
   create: true
@@ -145,6 +196,13 @@ paymentService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 productCatalogService:
   create: true
@@ -158,6 +216,13 @@ productCatalogService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 recommendationService:
   create: true
@@ -169,6 +234,13 @@ recommendationService:
     limits:
       cpu: 200m
       memory: 450Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 shippingService:
   create: true
@@ -180,6 +252,13 @@ shippingService:
     limits:
       cpu: 200m
       memory: 128Mi
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+
 
 cartDatabase:
   # Specifies the type of the cartservice's database, could be either redis or spanner.
@@ -196,3 +275,10 @@ cartDatabase:
     endpointAddress: ""
     endpointPort: ""
     certificate: ""
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 6
+    targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage : 75
+

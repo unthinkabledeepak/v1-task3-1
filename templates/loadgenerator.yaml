@@ -124,3 +124,40 @@ spec:
     {{- end }}
 {{- end }}
 {{- end }}
+
+
+---
+
+{{- if .Values.loadGenerator.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.loadGenerator.name }}
+  labels:
+    app: {{ .Values.loadGenerator.name }}
+  # namespace: {{ .Values.loadGenerator.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.loadGenerator.name }}
+  minReplicas: {{ .Values.loadGenerator.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.loadGenerator.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.loadGenerator.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.loadGenerator.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.loadGenerator.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.loadGenerator.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

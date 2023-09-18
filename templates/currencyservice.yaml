@@ -113,7 +113,7 @@ spec:
           app: {{ .Values.frontend.name }}
     - podSelector:
         matchLabels:
-          app: {{ .Values.checkoutService.name }}
+          app: {{ .Values.currencyService.name }}
     ports:
      - port: 7000
        protocol: TCP
@@ -155,7 +155,7 @@ spec:
         principals:
         {{- if .Values.serviceAccounts.create }}
         - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.frontend.name }}
-        - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.checkoutService.name }}
+        - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.currencyService.name }}
         {{- else }}
         - cluster.local/ns/{{ .Release.Namespace }}/sa/default
         {{- end }}
@@ -169,4 +169,41 @@ spec:
         ports:
         - "7000"
 {{- end }}
+{{- end }}
+
+
+---
+
+{{- if .Values.currencyService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.currencyService.name }}
+  labels:
+    app: {{ .Values.currencyService.name }}
+  # namespace: {{ .Values.currencyService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.currencyService.name }}
+  minReplicas: {{ .Values.currencyService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.currencyService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.currencyService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.currencyService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.currencyService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.currencyService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
 {{- end }}

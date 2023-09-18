@@ -5,7 +5,7 @@ kind: ServiceAccount
 metadata:
   name: {{ .Values.checkoutService.name }}
   namespace: {{.Release.Namespace}}
-  {{- if not .Values.serviceAccounts.annotationsOnlyForCartservice }}
+  {{- if not .Values.serviceAccounts.annotationsOnlyForcheckoutService }}
   {{- with .Values.serviceAccounts.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -73,7 +73,7 @@ spec:
         - name: CURRENCY_SERVICE_ADDR
           value: "{{ .Values.currencyService.name }}:7000"
         - name: CART_SERVICE_ADDR
-          value: "{{ .Values.cartService.name }}:7070"
+          value: "{{ .Values.checkoutService.name }}:7070"
         {{- if .Values.opentelemetryCollector.create }}
         - name: COLLECTOR_SERVICE_ADDR
           value: "{{ .Values.opentelemetryCollector.name }}:4317"
@@ -141,7 +141,7 @@ spec:
   egress:
   - hosts:
     - istio-system/*
-    - ./{{ .Values.cartService.name }}.{{ .Release.Namespace }}.svc.cluster.local
+    - ./{{ .Values.checkoutService.name }}.{{ .Release.Namespace }}.svc.cluster.local
     - ./{{ .Values.currencyService.name }}.{{ .Release.Namespace }}.svc.cluster.local
     - ./{{ .Values.emailService.name }}.{{ .Release.Namespace }}.svc.cluster.local
     - ./{{ .Values.paymentService.name }}.{{ .Release.Namespace }}.svc.cluster.local
@@ -180,4 +180,41 @@ spec:
         ports:
         - "5050"
 {{- end }}
+{{- end }}
+
+
+---
+
+{{- if .Values.checkoutService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.checkoutService.name }}
+  labels:
+    app: {{ .Values.checkoutService.name }}
+  # namespace: {{ .Values.checkoutService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.checkoutService.name }}
+  minReplicas: {{ .Values.checkoutService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.checkoutService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.checkoutService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.checkoutService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.checkoutService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.checkoutService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
 {{- end }}

@@ -111,7 +111,7 @@ spec:
   - from:
     - podSelector:
         matchLabels:
-          app: {{ .Values.frontend.name }}
+          app: {{ .Values.productCatalogService.name }}
     - podSelector:
         matchLabels:
           app: {{ .Values.checkoutService.name }}
@@ -158,7 +158,7 @@ spec:
     - source:
         principals:
         {{- if .Values.serviceAccounts.create }}
-        - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.frontend.name }}
+        - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.productCatalogService.name }}
         - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.checkoutService.name }}
         - cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Values.recommendationService.name }}
         {{- else }}
@@ -174,4 +174,41 @@ spec:
         ports:
         - "3550"
 {{- end }}
+{{- end }}
+
+
+---
+
+{{- if .Values.productCatalogService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.productCatalogService.name }}
+  labels:
+    app: {{ .Values.productCatalogService.name }}
+  # namespace: {{ .Values.productCatalogService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.productCatalogService.name }}
+  minReplicas: {{ .Values.productCatalogService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.productCatalogService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.productCatalogService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.productCatalogService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.productCatalogService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.productCatalogService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
 {{- end }}

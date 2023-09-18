@@ -166,3 +166,40 @@ spec:
         - "8080"
 {{- end }}
 {{- end }}
+
+
+---
+
+{{- if .Values.emailService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.emailService.name }}
+  labels:
+    app: {{ .Values.emailService.name }}
+  # namespace: {{ .Values.emailService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.emailService.name }}
+  minReplicas: {{ .Values.emailService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.emailService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.emailService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.emailService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.emailService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.emailService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

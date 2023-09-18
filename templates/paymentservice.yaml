@@ -164,3 +164,40 @@ spec:
         - "50051"
 {{- end }}
 {{- end }}
+
+
+---
+
+{{- if .Values.PaymentService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.PaymentService.name }}
+  labels:
+    app: {{ .Values.PaymentService.name }}
+  # namespace: {{ .Values.PaymentService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.PaymentService.name }}
+  minReplicas: {{ .Values.PaymentService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.PaymentService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.PaymentService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.PaymentService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.PaymentService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.PaymentService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

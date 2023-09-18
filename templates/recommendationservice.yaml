@@ -66,7 +66,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: "{{ .Values.productCatalogService.name }}:3550"
+          value: "{{ .Values.recommendationService.name }}:3550"
         {{- if .Values.opentelemetryCollector.create }}
         - name: COLLECTOR_SERVICE_ADDR
           value: "{{ .Values.opentelemetryCollector.name }}:4317"
@@ -134,7 +134,7 @@ spec:
   egress:
   - hosts:
     - istio-system/*
-    - ./{{ .Values.productCatalogService.name }}.{{ .Release.Namespace }}.svc.cluster.local
+    - ./{{ .Values.recommendationService.name }}.{{ .Release.Namespace }}.svc.cluster.local
     {{- if .Values.opentelemetryCollector.create }}
     - ./{{ .Values.opentelemetryCollector.name }}.{{ .Release.Namespace }}.svc.cluster.local
     {{- end }}
@@ -168,4 +168,41 @@ spec:
         ports:
         - "8080"
 {{- end }}
+{{- end }}
+
+
+---
+
+{{- if .Values.recommendationService.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Values.recommendationService.name }}
+  labels:
+    app: {{ .Values.recommendationService.name }}
+  # namespace: {{ .Values.recommendationService.namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Values.recommendationService.name }}
+  minReplicas: {{ .Values.recommendationService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.recommendationService.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.recommendationService.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.recommendationService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.recommendationService.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.recommendationService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
 {{- end }}
