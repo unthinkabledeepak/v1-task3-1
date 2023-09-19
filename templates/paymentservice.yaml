@@ -168,36 +168,36 @@ spec:
 
 ---
 
-{{- if .Values.PaymentService.autoscaling.enabled }}
+{{- if .Values.paymentService.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.PaymentService.name }}
+  name: {{ .Values.paymentService.name }}
   labels:
-    app: {{ .Values.PaymentService.name }}
-  # namespace: {{ .Values.PaymentService.namespace }}
+    app: {{ .Values.paymentService.name }}
+  # namespace: {{ .Values.paymentService.namespace }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ .Values.PaymentService.name }}
-  minReplicas: {{ .Values.PaymentService.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.PaymentService.autoscaling.maxReplicas }}
+    name: {{ .Values.paymentService.name }}
+  minReplicas: {{ .Values.paymentService.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.paymentService.autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.PaymentService.autoscaling.targetCPUUtilizationPercentage }}
+    {{- if .Values.paymentService.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .Values.PaymentService.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ .Values.paymentService.autoscaling.targetCPUUtilizationPercentage }}
     {{- end }}
-    {{- if .Values.PaymentService.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- if .Values.paymentService.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .Values.PaymentService.autoscaling.targetMemoryUtilizationPercentage }}
+          averageUtilization: {{ .Values.paymentService.autoscaling.targetMemoryUtilizationPercentage }}
     {{- end }}
 {{- end }}

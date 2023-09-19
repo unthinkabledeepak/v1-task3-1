@@ -203,39 +203,3 @@ spec:
 {{- end }}
 
 
-
----
-
-{{- if .Values.cartDatabase.autoscaling.enabled }}
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: {{ .Values.cartDatabase.name }}
-  labels:
-    app: {{ .Values.cartDatabase.name }}
-  # namespace: {{ .Values.cartDatabase.namespace }}
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: {{ .Values.cartDatabase.name }}
-  minReplicas: {{ .Values.cartDatabase.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.cartDatabase.autoscaling.maxReplicas }}
-  metrics:
-    {{- if .Values.cartDatabase.autoscaling.targetCPUUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: memory
-        target:
-          type: Utilization
-          averageUtilization: {{ .Values.cartDatabase.autoscaling.targetCPUUtilizationPercentage }}
-    {{- end }}
-    {{- if .Values.cartDatabase.autoscaling.targetMemoryUtilizationPercentage }}
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: {{ .Values.cartDatabase.autoscaling.targetMemoryUtilizationPercentage }}
-    {{- end }}
-{{- end }}
